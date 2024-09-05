@@ -9,7 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
     "@google/generative-ai": "^0.17.0",
+    "@mui/material": "^5.16.7",
+    "@react-spring/web": "^9.7.4",
+    "@use-gesture/react": "^10.3.1",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18"

@@ -1,94 +1,80 @@
-import Image from "next/image";
+'use client'
+
+import { useState, useEffect } from "react";
+import { Typography, Button, TextField, Stack, Box } from "@mui/material";
+import Deck from '../components/deck';
 
 export default function Home() {
+  const [message, setMessage] = useState('');
+  const [flashCards, setFlashCards] = useState([]);
+
+  const sendRequest = async () => {
+    if (!message.trim()) return;
+
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          "Content-Type": 'application/json'
+        },
+        body: JSON.stringify({prompt: message})
+      });
+
+      if (!response.ok){
+        throw new Error("Failed to fetch response from the API");
+      }
+
+      const data = await response.json();
+    
+      console.log(data);
+      setFlashCards(data);
+      console.log(flashCards);
+
+    } catch(e) {
+      console.error("Error fetching flashcards: ", e);
+    }
+  }
+
+
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+    <>
+    <Box
+      width="100vw"
+      height="100vh"
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      bgcolor="#f0f0f0"
+      p={2}
+    >
+      <Typography>Enter a prompt to generate flash cards</Typography>
+      <Stack spacing={2}>
+        <TextField
+          label="Type a message"
+          fullWidth
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          variant="outlined"
         />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Button
+          variant="contained"
+          onClick={sendRequest} // Call sendRequest when button is clicked
         >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+          Send
+        </Button>
+      </Stack>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      {flashCards.length > 0 ? (
+        <Box mt={4} width="100%" display="flex" justifyContent="center">
+          {/* Pass flashCards data to the Deck component */}
+          <Deck cardsData={flashCards} />
+        </Box>
+      ) : (
+        <Typography mt={4}>No flashcards yet. Please enter a prompt.</Typography>
+      )}
+    </Box>
+    </>
   );
 }
